@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../widgets/wave_header.dart';
 import 'login_screen.dart';
+import 'about_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -241,7 +242,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           [
             _buildSettingItemData('Aide & FAQ', Icons.help_outline, () {}),
             _buildSettingItemData('Nous contacter', Icons.email_outlined, () {}),
-            _buildSettingItemData('À propos', Icons.info_outline, () {}),
+            _buildSettingItemData('À propos', Icons.info_outline, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AboutScreen()),
+              );
+            }),
           ],
         ),
         SizedBox(height: 16),
