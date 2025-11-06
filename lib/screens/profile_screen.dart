@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import '../widgets/wave_header.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -535,9 +536,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             child: Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              // Logique de déconnexion
+
+              // Déconnexion via le provider
+              final provider = Provider.of<AppProvider>(context, listen: false);
+              await provider.logout();
+
+              // Navigation vers l'écran de login
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (route) => false,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
