@@ -18,15 +18,6 @@ class AboutScreen extends StatelessWidget {
                   size: 60,
                   color: Colors.white,
                 ),
-                SizedBox(height: 16),
-                Text(
-                  'À propos',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
               ],
             ),
           ),
@@ -36,52 +27,6 @@ class AboutScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Logo et nom de l'app
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade600,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.shade200,
-                                blurRadius: 15,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.hotel,
-                            size: 50,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'PicknDream',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade800,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Version 1.0.0',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 32),
-
                   // Description
                   _buildSection(
                     'À propos de PicknDream',
@@ -129,30 +74,6 @@ class AboutScreen extends StatelessWidget {
                     'de réservation d\'hôtels.',
                     Icons.group,
                   ),
-                  SizedBox(height: 24),
-
-                  // Technologies
-                  _buildSection(
-                    'Technologies',
-                    '',
-                    Icons.code,
-                  ),
-                  SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _buildTechChip('Flutter', Colors.blue),
-                      _buildTechChip('Next.js', Colors.black),
-                      _buildTechChip('PostgreSQL', Colors.indigo),
-                      _buildTechChip('Vercel', Colors.black87),
-                      _buildTechChip('Prisma', Colors.teal),
-                    ],
-                  ),
-                  SizedBox(height: 32),
-
-                  // Contact et liens
-                  _buildContactSection(context),
                   SizedBox(height: 24),
 
                   // Mentions légales
@@ -269,128 +190,6 @@ class AboutScreen extends StatelessWidget {
                 )),
           ],
         ],
-      ),
-    );
-  }
-
-  Widget _buildTechChip(String label, Color color) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactSection(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.contact_support, color: Colors.blue.shade600, size: 24),
-              SizedBox(width: 12),
-              Text(
-                'Contact & Support',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade800,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          _buildContactItem(
-            Icons.email,
-            'Email',
-            'contact@pickndream.com',
-            () {
-              // TODO: Ouvrir l'email
-            },
-          ),
-          SizedBox(height: 12),
-          _buildContactItem(
-            Icons.phone,
-            'Téléphone',
-            '+33 1 23 45 67 89',
-            () {
-              // TODO: Ouvrir le téléphone
-            },
-          ),
-          SizedBox(height: 12),
-          _buildContactItem(
-            Icons.language,
-            'Site Web',
-            'www.pickndream.com',
-            () {
-              // TODO: Ouvrir le site web
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContactItem(
-      IconData icon, String label, String value, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.blue.shade400, size: 20),
-            SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blue.shade800,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
-          ],
-        ),
       ),
     );
   }

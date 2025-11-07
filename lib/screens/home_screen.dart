@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/app_provider.dart';
 import '../widgets/hotel_card.dart';
 import '../widgets/wave_header.dart';
+import '../widgets/city_search_delegate.dart';
+import '../utils/translations.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -22,6 +24,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _categoryScrollController.addListener(_updateArrowVisibility);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadHotels();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Recharger les hôtels si on revient sur cet écran
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<AppProvider>();
+      if (provider.hotels.isEmpty && !provider.isLoading) {
+        _loadHotels();
+      }
     });
   }
 
@@ -113,29 +127,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.all(16),
-                        child: TextField(
-                          onChanged: (value) {
-                            provider.searchHotels(value);
+                        child: GestureDetector(
+                          onTap: () async {
+                            await showSearch(
+                              context: context,
+                              delegate: CitySearchDelegate(),
+                            );
                           },
-                          decoration: InputDecoration(
-                            hintText: 'Rechercher une destination...',
-                            prefixIcon: Icon(Icons.search, color: Colors.blue.shade600),
-                            suffixIcon: provider.searchQuery.isNotEmpty
-                                ? IconButton(
-                                    icon: Icon(Icons.clear, color: Colors.grey),
-                                    tooltip: 'Effacer la recherche',
-                                    onPressed: () {
-                                      provider.clearFilters();
-                                    },
-                                  )
-                                : null,
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25),
-                              borderSide: BorderSide.none,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: Colors.blue.shade600),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    provider.searchQuery.isNotEmpty 
+                                        ? provider.searchQuery 
+                                        : 'Rechercher une destination...',
+                                    style: TextStyle(
+                                      color: provider.searchQuery.isNotEmpty 
+                                          ? Colors.black 
+                                          : Colors.grey.shade600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                if (provider.searchQuery.isNotEmpty)
+                                  GestureDetector(
+                                    onTap: () => provider.clearFilters(),
+                                    child: Icon(Icons.clear, color: Colors.grey),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -155,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? 'Hôtels ${provider.selectedCategory}'
                               : provider.searchQuery.isNotEmpty
                                   ? 'Résultats de recherche'
-                                  : 'Hôtels recommandés',
+                                  : Translations.tr(context, 'recommended_hotels'),
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -244,25 +273,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategoryCarousel() {
     final categories = [
       {
-        'name': 'Luxe',
+        'name': Translations.tr(context, 'luxury'),
         'icon': Icons.diamond,
         'color': Colors.purple,
         'image': 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80',
       },
       {
-        'name': 'Famille',
+        'name': Translations.tr(context, 'family'),
         'icon': Icons.family_restroom,
         'color': Colors.green,
         'image': 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80',
       },
       {
-        'name': 'Business',
+        'name': Translations.tr(context, 'business'),
         'icon': Icons.business_center,
         'color': Colors.blue,
         'image': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80',
       },
       {
-        'name': 'Romantique',
+        'name': Translations.tr(context, 'romantic'),
         'icon': Icons.favorite,
         'color': Colors.pink,
         'image': 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',

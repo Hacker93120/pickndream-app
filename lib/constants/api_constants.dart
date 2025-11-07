@@ -24,13 +24,14 @@ class ApiConstants {
   static const String uploadEndpoint = '/api/upload';
 
   // Timeout pour les requêtes HTTP (en secondes)
-  static const int connectionTimeout = 30;
-  static const int receiveTimeout = 30;
+  static const int connectionTimeout = 10; // Réduit pour éviter les blocages
+  static const int receiveTimeout = 10;
 
   // Headers par défaut
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'User-Agent': 'PicknDream-Flutter-App',
   };
 
   // Headers avec authentification
@@ -38,5 +39,6 @@ class ApiConstants {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Authorization': 'Bearer $token',
+    'User-Agent': 'PicknDream-Flutter-App',
   };
 }

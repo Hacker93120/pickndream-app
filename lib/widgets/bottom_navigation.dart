@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/app_provider.dart';
+import '../utils/translations.dart';
 
 class BottomNavigation extends StatelessWidget {
   final int currentIndex;
@@ -12,6 +15,9 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<AppProvider>(context);
+    final lang = provider.selectedLanguage;
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -31,9 +37,9 @@ class BottomNavigation extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(0, Icons.home_rounded, 'Accueil'),
-              _buildNavItem(1, Icons.favorite_rounded, 'Favoris'),
-              _buildNavItem(2, Icons.person_rounded, 'Profil'),
+              _buildNavItem(0, Icons.home_rounded, Translations.get('home', lang)),
+              _buildNavItem(1, Icons.favorite_rounded, Translations.get('favorites', lang)),
+              _buildNavItem(2, Icons.person_rounded, Translations.get('profile', lang)),
             ],
           ),
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/translations.dart';
 
 class FavoritesScreen extends StatelessWidget {
   // Données d'exemple des favoris
@@ -38,7 +39,7 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text('Mes Favoris'),
+        title: Text(Translations.tr(context, 'my_favorites')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,

@@ -18,6 +18,14 @@ class AppProvider with ChangeNotifier {
   List<Booking> _bookings = [];
   Subscription? _currentSubscription;
   bool _isLoading = false;
+  String _selectedLanguage = 'fr';
+
+  String get selectedLanguage => _selectedLanguage;
+
+  void changeLanguage(String languageCode) {
+    _selectedLanguage = languageCode;
+    notifyListeners();
+  }
   String _searchQuery = '';
   String? _selectedCategory;
   String? _errorMessage;
@@ -120,22 +128,31 @@ class AppProvider with ChangeNotifier {
 
   /// Charger les hôtels depuis l'API
   Future<void> loadHotelsFromAPI() async {
+    if (_isLoading) return; // Éviter les appels multiples
+    
     setLoading(true);
     setError(null);
 
-    final result = await _hotelService.getHotels();
+    try {
+      final result = await _hotelService.getHotels();
 
-    if (result['success']) {
+      // Toujours considérer comme succès car on a un fallback
       _allHotels = result['hotels'] ?? [];
       _hotels = List.from(_allHotels);
       _applyFilters();
-    } else {
-      setError(result['message']);
-      // En cas d'erreur, charger les données d'exemple
+      
+      // Afficher un message si on utilise les données d'exemple
+      if (result['message'] != null) {
+        print('Info: ${result['message']}');
+      }
+      
+    } catch (e) {
+      print('Erreur chargement hôtels: $e');
+      setError('Erreur de connexion - Données d\'exemple chargées');
       loadSampleHotels();
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   /// Charger les données d'exemple (fallback)

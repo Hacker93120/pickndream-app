@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'providers/app_provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Optimisation des performances
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+  
   runApp(MyApp());
 }
 
@@ -42,23 +50,34 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkAuthAndNavigate() async {
     final provider = Provider.of<AppProvider>(context, listen: false);
 
-    // Vérifier l'authentification
-    await provider.checkAuth();
+    try {
+      // Vérifier l'authentification de manière asynchrone
+      await provider.checkAuth();
 
-    // Attendre un petit délai pour l'affichage du splash (optionnel)
-    await Future.delayed(Duration(milliseconds: 500));
+      // Attendre un petit délai pour l'affichage du splash
+      await Future.delayed(Duration(milliseconds: 300));
 
-    // Navigation selon l'état d'authentification
-    if (provider.isAuthenticated) {
-      // Charger les données
-      await provider.loadHotelsFromAPI();
+      if (!mounted) return;
 
-      // Naviguer vers l'écran principal
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => MainScreen()),
-      );
-    } else {
-      // Naviguer vers l'écran de login
+      // Navigation selon l'état d'authentification
+      if (provider.isAuthenticated) {
+        // Charger les données en arrière-plan
+        provider.loadHotelsFromAPI();
+
+        // Naviguer vers l'écran principal
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => MainScreen()),
+        );
+      } else {
+        // Naviguer vers l'écran de login
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => LoginScreen()),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      // En cas d'erreur, aller vers le login
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => LoginScreen()),
       );

@@ -4,6 +4,11 @@ import '../providers/app_provider.dart';
 import '../widgets/wave_header.dart';
 import 'login_screen.dart';
 import 'about_screen.dart';
+import 'contact_screen.dart';
+import 'help_screen.dart';
+import 'currency_screen.dart';
+import 'language_screen.dart';
+import '../utils/translations.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -14,6 +19,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  String _selectedCurrency = '🇲🇦 MAD';
+  String _selectedLanguage = 'Français';
+  bool _showAboutInfo = false;
 
   @override
   void initState() {
@@ -194,13 +202,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   }
 
   Widget _buildSettingsSection() {
+    final provider = Provider.of<AppProvider>(context);
+    final lang = provider.selectedLanguage;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            'Paramètres',
+            Translations.get('settings', lang),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -209,40 +220,72 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ),
         ),
         _buildSettingsGroup(
-          'Compte',
+          Translations.get('account', lang),
           [
-            _buildSettingItemData('Modifier le profil', Icons.edit_outlined, () {
+            _buildSettingItemData(Translations.get('edit_profile', lang), Icons.edit_outlined, () {
               _showEditProfileDialog();
             }),
-            _buildSettingItemData('Mes informations', Icons.person_outline, () {}),
-            _buildSettingItemData('Changer le mot de passe', Icons.lock_outline, () {}),
+            _buildSettingItemData(Translations.get('my_info', lang), Icons.person_outline, () {}),
+            _buildSettingItemData(Translations.get('change_password', lang), Icons.lock_outline, () {}),
           ],
         ),
         SizedBox(height: 16),
         _buildSettingsGroup(
-          'Réservations & Favoris',
+          Translations.get('reservations_favorites', lang),
           [
-            _buildSettingItemData('Mes réservations', Icons.hotel_outlined, () {}),
-            _buildSettingItemData('Mes favoris', Icons.favorite_outline, () {}),
-            _buildSettingItemData('Historique', Icons.history, () {}),
+            _buildSettingItemData(Translations.get('my_reservations', lang), Icons.hotel_outlined, () {}),
+            _buildSettingItemData(Translations.get('my_favorites', lang), Icons.favorite_outline, () {}),
+            _buildSettingItemData(Translations.get('history', lang), Icons.history, () {}),
           ],
         ),
         SizedBox(height: 16),
         _buildSettingsGroup(
-          'Préférences',
+          Translations.get('preferences', lang),
           [
-            _buildSettingItemData('Notifications', Icons.notifications_outlined, () {}, hasSwitch: true),
-            _buildSettingItemData('Langue', Icons.language, () {}, subtitle: 'Français'),
-            _buildSettingItemData('Devise', Icons.attach_money, () {}, subtitle: 'MAD'),
+            _buildSettingItemData(Translations.get('notifications', lang), Icons.notifications_outlined, () {}, hasSwitch: true),
+            _buildSettingItemData(Translations.get('language', lang), Icons.language, () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LanguageScreen()),
+              );
+              if (result != null) {
+                final provider = Provider.of<AppProvider>(context, listen: false);
+                provider.changeLanguage(result['code']);
+                setState(() {
+                  _selectedLanguage = result['name'];
+                });
+              }
+            }, subtitle: _selectedLanguage),
+            _buildSettingItemData(Translations.get('currency', lang), Icons.attach_money, () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CurrencyScreen()),
+              );
+              if (result != null) {
+                setState(() {
+                  _selectedCurrency = '${result['flag']} ${result['currency']}';
+                });
+              }
+            }, subtitle: _selectedCurrency),
           ],
         ),
         SizedBox(height: 16),
         _buildSettingsGroup(
-          'Support',
+          Translations.get('support', lang),
           [
-            _buildSettingItemData('Aide & FAQ', Icons.help_outline, () {}),
-            _buildSettingItemData('Nous contacter', Icons.email_outlined, () {}),
-            _buildSettingItemData('À propos', Icons.info_outline, () {
+            _buildSettingItemData(Translations.get('help_faq', lang), Icons.help_outline, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelpScreen()),
+              );
+            }),
+            _buildSettingItemData(Translations.get('contact_us', lang), Icons.email_outlined, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ContactScreen()),
+              );
+            }),
+            _buildSettingItemData(Translations.get('about', lang), Icons.info_outline, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AboutScreen()),
@@ -254,7 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         _buildSettingsGroup(
           '',
           [
-            _buildSettingItemData('Se déconnecter', Icons.logout, () {
+            _buildSettingItemData(Translations.get('logout', lang), Icons.logout, () {
               _showLogoutDialog();
             }, isDestructive: true),
           ],

@@ -1,0 +1,817 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Users,
+  Hotel,
+  MapPin,
+  DollarSign,
+  TrendingUp,
+  Calendar,
+  Bell,
+  Settings,
+  Menu,
+  X,
+  BarChart3,
+  MessageSquare,
+  Shield,
+  HelpCircle,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Star,
+  Clock,
+  AlertTriangle,
+  FileText,
+  CreditCard,
+  Globe,
+  Bed,
+  Building2,
+  CheckCircle2
+} from 'lucide-react'
+
+export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [expandedMenus, setExpandedMenus] = useState<string[]>(['dashboard'])
+  const [activePage, setActivePage] = useState('dashboard')
+  const [activeSubPage, setActiveSubPage] = useState('overview')
+
+  const toggleMenu = (menuId: string) => {
+    setExpandedMenus(prev =>
+      prev.includes(menuId)
+        ? prev.filter(id => id !== menuId)
+        : [...prev, menuId]
+    )
+  }
+
+  const handlePageChange = (page: string, subPage?: string) => {
+    setActivePage(page)
+    if (subPage) setActiveSubPage(subPage)
+    setSidebarOpen(false)
+  }
+
+  const stats = [
+    { name: 'Clients actifs', value: '2,847', icon: Users, change: '+12%' },
+    { name: 'Réservations aujourd\'hui', value: '156', icon: Hotel, change: '+8%' },
+    { name: 'Revenus du jour', value: '€8,247', icon: DollarSign, change: '+15%' },
+    { name: 'Hôtels partenaires', value: '43', icon: Building2, change: '+5%' },
+  ]
+
+  const recentBookings = [
+    { id: 1, client: 'Marie D.', hotel: 'Hôtel Le Grand Paris', room: 'Suite Deluxe', nights: '3 nuits', price: '€450', status: 'Confirmée', date: '15-20 Nov', email: 'marie.d@email.com' },
+    { id: 2, client: 'Jean M.', hotel: 'Lyon Palace', room: 'Chambre Standard', nights: '2 nuits', price: '€180', status: 'En attente', date: '18-20 Nov', email: 'jean.m@email.com' },
+    { id: 3, client: 'Sophie L.', hotel: 'Marseille Riviera', room: 'Suite Vue Mer', nights: '5 nuits', price: '€890', status: 'Confirmée', date: '20-25 Nov', email: 'sophie.l@email.com' },
+    { id: 4, client: 'Pierre R.', hotel: 'Nice Azur Resort', room: 'Chambre Supérieure', nights: '4 nuits', price: '€520', status: 'Check-in', date: '12-16 Nov', email: 'pierre.r@email.com' },
+    { id: 5, client: 'Julie B.', hotel: 'Paris Centre Hotel', room: 'Chambre Twin', nights: '1 nuit', price: '€120', status: 'Confirmée', date: '16 Nov', email: 'julie.b@email.com' },
+    { id: 6, client: 'Marc L.', hotel: 'Bordeaux Grand', room: 'Suite Prestige', nights: '7 nuits', price: '€1250', status: 'Confirmée', date: '22-29 Nov', email: 'marc.l@email.com' },
+    { id: 7, client: 'Emma F.', hotel: 'Strasbourg Palace', room: 'Chambre Standard', nights: '2 nuits', price: '€240', status: 'Check-out', date: '10-12 Nov', email: 'emma.f@email.com' },
+    { id: 8, client: 'Thomas G.', hotel: 'Toulouse Royal', room: 'Suite Junior', nights: '3 nuits', price: '€390', status: 'Confirmée', date: '25-28 Nov', email: 'thomas.g@email.com' },
+  ]
+
+  const allHotels = [
+    { id: 1, name: 'Hôtel Le Grand Paris', city: 'Paris', rooms: 120, available: 45, rating: 4.8, price: '€150-450', image: '🏨' },
+    { id: 2, name: 'Lyon Palace', city: 'Lyon', rooms: 80, available: 23, rating: 4.5, price: '€90-280', image: '🏨' },
+    { id: 3, name: 'Marseille Riviera', city: 'Marseille', rooms: 95, available: 38, rating: 4.7, price: '€120-350', image: '🏨' },
+    { id: 4, name: 'Nice Azur Resort', city: 'Nice', rooms: 150, available: 62, rating: 4.9, price: '€180-520', image: '🏨' },
+    { id: 5, name: 'Paris Centre Hotel', city: 'Paris', rooms: 60, available: 15, rating: 4.3, price: '€80-200', image: '🏨' },
+    { id: 6, name: 'Bordeaux Grand', city: 'Bordeaux', rooms: 75, available: 28, rating: 4.6, price: '€110-320', image: '🏨' },
+  ]
+
+  const allClients = [
+    { id: 1, name: 'Marie Dubois', email: 'marie.d@email.com', phone: '+33 6 12 34 56 78', bookings: 8, status: 'Premium', joined: 'Jan 2023' },
+    { id: 2, name: 'Jean Martin', email: 'jean.m@email.com', phone: '+33 6 23 45 67 89', bookings: 3, status: 'Standard', joined: 'Mar 2024' },
+    { id: 3, name: 'Sophie Laurent', email: 'sophie.l@email.com', phone: '+33 6 34 56 78 90', bookings: 12, status: 'Premium', joined: 'Aug 2022' },
+    { id: 4, name: 'Pierre Rousseau', email: 'pierre.r@email.com', phone: '+33 6 45 67 89 01', bookings: 5, status: 'Standard', joined: 'Jun 2023' },
+  ]
+
+  const weeklyActivity = [
+    { day: 'Lun', bookings: 124, revenue: 8840 },
+    { day: 'Mar', bookings: 142, revenue: 10120 },
+    { day: 'Mer', bookings: 136, revenue: 9650 },
+    { day: 'Jeu', bookings: 158, revenue: 11240 },
+    { day: 'Ven', bookings: 189, revenue: 14280 },
+    { day: 'Sam', bookings: 195, revenue: 16650 },
+    { day: 'Dim', bookings: 167, revenue: 12890 },
+  ]
+
+  const maxBookings = Math.max(...weeklyActivity.map(d => d.bookings))
+
+  const menuItems = [
+    {
+      id: 'dashboard',
+      name: 'Tableau de bord',
+      icon: TrendingUp,
+      active: true,
+      submenu: [
+        { name: 'Vue d\'ensemble', icon: BarChart3, active: true },
+        { name: 'Analytiques', icon: TrendingUp },
+        { name: 'Rapports', icon: FileText }
+      ]
+    },
+    {
+      id: 'bookings',
+      name: 'Réservations',
+      icon: Calendar,
+      submenu: [
+        { name: 'Réservations actives', icon: Clock },
+        { name: 'Check-in aujourd\'hui', icon: CheckCircle2 },
+        { name: 'Check-out aujourd\'hui', icon: CheckCircle2 },
+        { name: 'Historique', icon: Calendar }
+      ]
+    },
+    {
+      id: 'hotels',
+      name: 'Hôtels',
+      icon: Building2,
+      submenu: [
+        { name: 'Tous les hôtels', icon: Building2 },
+        { name: 'Chambres disponibles', icon: Bed },
+        { name: 'Tarifs & Promotions', icon: DollarSign },
+        { name: 'Avis clients', icon: Star }
+      ]
+    },
+    {
+      id: 'clients',
+      name: 'Gestion clients',
+      icon: Users,
+      submenu: [
+        { name: 'Tous les clients', icon: Users },
+        { name: 'Membres Premium', icon: Star },
+        { name: 'Programme fidélité', icon: Star }
+      ]
+    },
+    {
+      id: 'finance',
+      name: 'Finances',
+      icon: DollarSign,
+      submenu: [
+        { name: 'Revenus', icon: TrendingUp },
+        { name: 'Paiements', icon: CreditCard },
+        { name: 'Factures', icon: FileText }
+      ]
+    },
+    {
+      id: 'locations',
+      name: 'Destinations',
+      icon: MapPin,
+      submenu: [
+        { name: 'Villes populaires', icon: MapPin },
+        { name: 'Tarification par zone', icon: DollarSign },
+        { name: 'Carte interactive', icon: Globe }
+      ]
+    },
+    {
+      id: 'support',
+      name: 'Support',
+      icon: MessageSquare,
+      submenu: [
+        { name: 'Messages', icon: MessageSquare },
+        { name: 'Tickets', icon: HelpCircle },
+        { name: 'FAQ', icon: FileText }
+      ]
+    }
+  ]
+
+  // Render content based on active page
+  const renderContent = () => {
+    switch (activePage) {
+      case 'dashboard':
+        return renderDashboard()
+      case 'bookings':
+        return renderBookings()
+      case 'hotels':
+        return renderHotels()
+      case 'clients':
+        return renderClients()
+      case 'finance':
+        return renderFinance()
+      case 'locations':
+        return renderLocations()
+      default:
+        return renderDashboard()
+    }
+  }
+
+  const renderDashboard = () => (
+    <div className="p-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Tableau de bord</h2>
+        <p className="text-sm text-gray-600">Vue d'ensemble de votre activité</p>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((stat) => (
+          <div key={stat.name} className="bg-white rounded-lg shadow p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <stat.icon className="h-6 w-6 text-blue-500" />
+              </div>
+              <div className="ml-3">
+                <p className="text-xs font-medium text-gray-600">{stat.name}</p>
+                <div className="flex items-baseline">
+                  <p className="text-xl font-semibold text-gray-900">{stat.value}</p>
+                  <p className="ml-2 text-xs font-medium text-green-600">{stat.change}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts and tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Recent bookings */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-4 py-3 border-b">
+            <h3 className="text-base font-medium text-gray-900">Réservations récentes</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Hôtel</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {recentBookings.slice(0, 4).map((booking) => (
+                  <tr key={booking.id}>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {booking.client}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      <div className="font-medium text-gray-900">{booking.hotel}</div>
+                      <div className="text-gray-500">{booking.room} • {booking.nights}</div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      {booking.price}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        booking.status === 'Confirmée' ? 'bg-green-100 text-green-800' :
+                        booking.status === 'Check-in' ? 'bg-blue-100 text-blue-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {booking.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Activity chart */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-4 py-3 border-b flex items-center justify-between">
+            <h3 className="text-base font-medium text-gray-900">Réservations de la semaine</h3>
+            <div className="flex items-center space-x-2 text-xs text-gray-500">
+              <div className="flex items-center space-x-1">
+                <div className="w-2 h-2 bg-blue-500 rounded"></div>
+                <span>Réservations</span>
+              </div>
+            </div>
+          </div>
+          <div className="p-4">
+            <div className="h-48">
+              <div className="flex items-end justify-between h-full space-x-2">
+                {weeklyActivity.map((data, index) => {
+                  const height = (data.bookings / maxBookings) * 100
+                  return (
+                    <div key={index} className="flex-1 flex flex-col items-center">
+                      <div className="w-full flex flex-col items-center space-y-1 mb-2">
+                        <div className="relative group">
+                          <div
+                            className="w-full bg-gradient-to-t from-red-500 via-yellow-500 to-green-500 rounded-t-md hover:shadow-lg transition-all cursor-pointer"
+                            style={{ height: `${height * 1.4}px` }}
+                          ></div>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
+                            <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap shadow-xl">
+                              <div className="font-semibold">{data.bookings} réservations</div>
+                              <div className="text-gray-300">€{data.revenue}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-medium text-gray-600">{data.bookings}</span>
+                      </div>
+                      <span className="text-xs text-gray-500 mt-1">{data.day}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center space-x-4">
+                <div>
+                  <span className="font-medium text-gray-900">1,111</span>
+                  <span className="ml-1">réservations totales</span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-900">€83,670</span>
+                  <span className="ml-1">revenus</span>
+                </div>
+              </div>
+              <div className="flex items-center text-green-600">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                <span>+12% vs semaine précédente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderBookings = () => (
+    <div className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Gestion des Réservations</h2>
+          <p className="text-sm text-gray-600">Toutes les réservations d'hôtels</p>
+        </div>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+          + Nouvelle réservation
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <select className="px-3 py-2 border border-gray-300 rounded-md text-sm">
+            <option>Tous les statuts</option>
+            <option>Confirmée</option>
+            <option>En attente</option>
+            <option>Check-in</option>
+            <option>Check-out</option>
+          </select>
+          <input type="date" className="px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          <input type="text" placeholder="Rechercher client..." className="px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm font-medium">
+            Filtrer
+          </button>
+        </div>
+      </div>
+
+      {/* Bookings table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hôtel</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Chambre</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dates</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {recentBookings.map((booking) => (
+              <tr key={booking.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 text-sm text-gray-900">#{booking.id}</td>
+                <td className="px-4 py-3">
+                  <div className="text-sm font-medium text-gray-900">{booking.client}</div>
+                  <div className="text-xs text-gray-500">{booking.email}</div>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">{booking.hotel}</td>
+                <td className="px-4 py-3 text-xs text-gray-600">{booking.room}</td>
+                <td className="px-4 py-3 text-xs text-gray-600">{booking.date}</td>
+                <td className="px-4 py-3 text-sm font-semibold text-gray-900">{booking.price}</td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    booking.status === 'Confirmée' ? 'bg-green-100 text-green-800' :
+                    booking.status === 'Check-in' ? 'bg-blue-100 text-blue-800' :
+                    booking.status === 'Check-out' ? 'bg-gray-100 text-gray-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {booking.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <button className="text-blue-600 hover:text-blue-800 text-xs font-medium">Détails</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+
+  const renderHotels = () => (
+    <div className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Gestion des Hôtels</h2>
+          <p className="text-sm text-gray-600">Liste de tous les hôtels partenaires</p>
+        </div>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+          + Ajouter un hôtel
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {allHotels.map((hotel) => (
+          <div key={hotel.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+            <div className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="text-4xl">{hotel.image}</div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{hotel.name}</h3>
+                    <p className="text-xs text-gray-500">{hotel.city}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  <span className="text-sm font-medium text-gray-900">{hotel.rating}</span>
+                </div>
+              </div>
+
+              <div className="space-y-2 mb-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Chambres totales</span>
+                  <span className="font-medium text-gray-900">{hotel.rooms}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Disponibles</span>
+                  <span className="font-medium text-green-600">{hotel.available}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Tarif</span>
+                  <span className="font-medium text-gray-900">{hotel.price}</span>
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <button className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs font-medium">
+                  Voir détails
+                </button>
+                <button className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-xs font-medium">
+                  Modifier
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const renderClients = () => (
+    <div className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Gestion des Clients</h2>
+          <p className="text-sm text-gray-600">Base de données des clients</p>
+        </div>
+        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+          + Ajouter un client
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Réservations</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Membre depuis</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {allClients.map((client) => (
+              <tr key={client.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-medium">{client.name.split(' ').map(n => n[0]).join('')}</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{client.name}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="text-sm text-gray-900">{client.email}</div>
+                  <div className="text-xs text-gray-500">{client.phone}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                    {client.bookings} réservations
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    client.status === 'Premium' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    <Star className="h-3 w-3 mr-1" />
+                    {client.status}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-600">{client.joined}</td>
+                <td className="px-4 py-3">
+                  <button className="text-blue-600 hover:text-blue-800 text-xs font-medium">Voir profil</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+
+  const renderFinance = () => (
+    <div className="p-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Finances</h2>
+        <p className="text-sm text-gray-600">Revenus et paiements</p>
+      </div>
+
+      {/* Finance stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-600">Revenus du mois</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">€245,680</p>
+              <p className="mt-1 text-xs text-green-600">+18% vs mois dernier</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <DollarSign className="h-6 w-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-600">Paiements en attente</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">€12,450</p>
+              <p className="mt-1 text-xs text-yellow-600">8 factures</p>
+            </div>
+            <div className="p-3 bg-yellow-100 rounded-lg">
+              <Clock className="h-6 w-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-600">Commissions</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">€24,568</p>
+              <p className="mt-1 text-xs text-blue-600">10% du CA</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Transactions table */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-4 py-3 border-b">
+          <h3 className="text-base font-medium text-gray-900">Transactions récentes</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hôtel</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Commission</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {recentBookings.map((booking) => {
+                const amount = parseInt(booking.price.replace('€', ''))
+                const commission = Math.round(amount * 0.1)
+                return (
+                  <tr key={booking.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-900">#{booking.id}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{booking.client}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{booking.hotel}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">{booking.price}</td>
+                    <td className="px-4 py-3 text-sm text-green-600">€{commission}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        Payé
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-600">{booking.date}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderLocations = () => (
+    <div className="p-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Destinations</h2>
+        <p className="text-sm text-gray-600">Villes et zones de service</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {[
+          { city: 'Paris', hotels: 12, bookings: 456, revenue: '€124,500' },
+          { city: 'Lyon', hotels: 5, bookings: 189, revenue: '€52,300' },
+          { city: 'Marseille', hotels: 7, bookings: 234, revenue: '€67,800' },
+          { city: 'Nice', hotels: 8, bookings: 298, revenue: '€89,200' },
+          { city: 'Bordeaux', hotels: 4, bookings: 145, revenue: '€42,100' },
+          { city: 'Strasbourg', hotels: 3, bookings: 98, revenue: '€28,600' },
+          { city: 'Toulouse', hotels: 4, bookings: 167, revenue: '€48,900' },
+          { city: 'Nantes', hotels: 3, bookings: 112, revenue: '€32,400' },
+        ].map((location, index) => (
+          <div key={index} className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <MapPin className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">{location.city}</h3>
+                <p className="text-xs text-gray-500">{location.hotels} hôtels</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Réservations</span>
+                <span className="font-medium text-gray-900">{location.bookings}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Revenus</span>
+                <span className="font-medium text-green-600">{location.revenue}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-base font-medium text-gray-900 mb-4">Carte interactive</h3>
+        <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <Globe className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+            <p className="text-sm">Carte des destinations</p>
+            <p className="text-xs text-gray-400">Intégration de carte à venir</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-slate-900 to-slate-800 shadow-xl transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
+        {/* Header */}
+        <div className="flex items-center justify-between h-14 px-4 border-b border-slate-700 flex-shrink-0">
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+              <Hotel className="h-4 w-4 text-white" />
+            </div>
+            <h1 className="text-lg font-bold text-white">Pickn Dream</h1>
+          </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden text-slate-400 hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        {/* User Profile */}
+        <div className="px-4 py-3 border-b border-slate-700 flex-shrink-0">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-medium">AD</span>
+            </div>
+            <div>
+              <p className="text-white text-sm font-medium">Admin</p>
+              <p className="text-slate-400 text-xs">Administrateur</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          {menuItems.map((item) => (
+            <div key={item.id}>
+              <button
+                onClick={() => toggleMenu(item.id)}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all ${
+                  item.active 
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
+                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </div>
+                {expandedMenus.includes(item.id) ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronRight className="h-3 w-3" />
+                )}
+              </button>
+              
+              {/* Submenu */}
+              {expandedMenus.includes(item.id) && (
+                <div className="mt-1 ml-4 space-y-1">
+                  {item.submenu.map((subItem, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handlePageChange(item.id, subItem.name.toLowerCase().replace(/ /g, '-'))}
+                      className={`w-full flex items-center space-x-2 px-3 py-1.5 text-xs rounded-md transition-colors ${
+                        (subItem as any).active
+                          ? 'bg-slate-700 text-blue-400'
+                          : 'text-slate-400 hover:bg-slate-700 hover:text-white'
+                      }`}
+                    >
+                      <subItem.icon className="h-3 w-3" />
+                      <span>{subItem.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        {/* Bottom Section */}
+        <div className="px-3 py-3 border-t border-slate-700 space-y-1 flex-shrink-0">
+          <a href="#" className="flex items-center space-x-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+            <Settings className="h-4 w-4" />
+            <span>Paramètres</span>
+          </a>
+          <a href="#" className="flex items-center space-x-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-700 hover:text-white rounded-md transition-colors">
+            <HelpCircle className="h-4 w-4" />
+            <span>Aide</span>
+          </a>
+          <button className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-red-400 hover:bg-red-900/20 rounded-md transition-colors">
+            <LogOut className="h-4 w-4" />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <div className="flex-1 lg:ml-0">
+        {/* Top bar */}
+        <div className="bg-white shadow-sm border-b h-14 flex items-center justify-between px-4">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-gray-500 hover:text-gray-700"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Tableau de bord</h2>
+              <p className="text-xs text-gray-500">Administration Pickn Dream</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <Bell className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+              <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+            </div>
+            <div className="h-7 w-7 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer">
+              <span className="text-white text-xs font-medium">AD</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */
+        {renderContent()}
+      </div>
+    </div>
+  )
+}

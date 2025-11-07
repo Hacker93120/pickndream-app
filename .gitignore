@@ -44,3 +44,4 @@ app.*.map.json
 
 # Backend dashboard (separate repository)
 pickndream-dashboard/
+.vercel
