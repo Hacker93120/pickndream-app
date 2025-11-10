@@ -28,7 +28,7 @@ export async function PATCH(
     const hotel = await prisma.hotel.update({
       where: { id: params.id },
       data: {
-        status: "APPROVED",
+        status: "ACTIVE",
         rejectionReason: null,
       },
     });

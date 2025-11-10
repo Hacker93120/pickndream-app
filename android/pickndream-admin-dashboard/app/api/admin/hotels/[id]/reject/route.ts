@@ -32,7 +32,7 @@ export async function PATCH(
     const hotel = await prisma.hotel.update({
       where: { id: params.id },
       data: {
-        status: "REJECTED",
+        status: "INACTIVE",
         rejectionReason: reason || "Non conforme",
       },
     });

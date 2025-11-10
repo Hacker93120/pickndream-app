@@ -29,11 +29,29 @@ export async function GET(req: NextRequest) {
     let whereClause: any = {};
 
     if (statusFilter === "PENDING") {
-      whereClause = { status: "PENDING_REVIEW" };
+      // Chercher les hôtels en attente (PENDING ou PENDING_REVIEW)
+      whereClause = {
+        OR: [
+          { status: "PENDING" },
+          { status: "PENDING_REVIEW" }
+        ]
+      };
     } else if (statusFilter === "ACTIVE") {
-      whereClause = { status: "APPROVED" };
+      // Chercher les hôtels approuvés (APPROVED ou ACTIVE)
+      whereClause = {
+        OR: [
+          { status: "APPROVED" },
+          { status: "ACTIVE" }
+        ]
+      };
     } else if (statusFilter === "INACTIVE") {
-      whereClause = { status: "REJECTED" };
+      // Chercher les hôtels rejetés (REJECTED ou INACTIVE)
+      whereClause = {
+        OR: [
+          { status: "REJECTED" },
+          { status: "INACTIVE" }
+        ]
+      };
     }
     // Si "all", on ne met pas de filtre de statut
 

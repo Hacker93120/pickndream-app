@@ -19,6 +19,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  hotels    Hotel[]
   bookings  Booking[]
   photos    Photo[]
 }
@@ -30,26 +31,43 @@ enum Role {
 
 model Hotel {
   id          String   @id @default(cuid())
+  ownerId     String
   name        String
   description String?
   city        String
   address     String
   country     String   @default("France")
+  latitude    Float?
+  longitude   Float?
   rating      Float    @default(0)
   pricePerNight Int
-  status      HotelStatus @default(PENDING)
+  status      HotelStatus @default(PENDING_REVIEW)
+  isListed   Boolean  @default(false)
   photoUrl    String?
+  rejectionReason String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   bookings    Booking[]
   photos      Photo[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([isListed])
 }
 
 enum HotelStatus {
+  // Nouveaux statuts
   PENDING
+  PENDING_REVIEW
   ACTIVE
   INACTIVE
+  // Anciens statuts (pour compatibilité)
+  DRAFT
+  APPROVED
+  REJECTED
+  PAUSED
 }
 
 model Booking {
