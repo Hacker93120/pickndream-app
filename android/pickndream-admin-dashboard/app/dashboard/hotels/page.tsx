@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Pagination from "@/components/Pagination";
-import { exportToCSV } from "@/utils/exportCSV";
 
 type Hotel = {
   id: string;
@@ -15,247 +13,276 @@ type Hotel = {
   rating: number;
   pricePerNight: number;
   status: string;
+  isListed: boolean;
   photoUrl: string | null;
+  rejectionReason: string | null;
   createdAt: string;
-  bookings_count: number;
+  owner?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 };
 
 export default function HotelsManagement() {
   const router = useRouter();
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const hotelsPerPage = 10;
+  const [filter, setFilter] = useState("PENDING");
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHotels();
-  }, []);
+  }, [filter]);
 
   const fetchHotels = async () => {
     try {
       const token = localStorage.getItem("pd_token");
-      const res = await fetch("/api/admin/hotels", {
+      console.log("🔑 Token:", token ? "présent" : "absent");
+      console.log("🔍 Filtre:", filter);
+
+      const res = await fetch(`/api/admin/hotels?status=${filter}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log("📡 Status de la réponse:", res.status);
+
       if (res.ok) {
         const data = await res.json();
+        console.log("✅ Données reçues:", data);
         setHotels(data.hotels);
+      } else {
+        const errorData = await res.json().catch(() => ({ message: "Erreur inconnue" }));
+        console.error("❌ Erreur API:", res.status, errorData);
       }
     } catch (error) {
-      console.error("Erreur chargement hôtels:", error);
+      console.error("❌ Erreur chargement hôtels:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleStatus = async (hotelId: string, currentStatus: string) => {
-    const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-
+  const handleApprove = async (hotelId: string) => {
+    setActionLoading(hotelId);
     try {
       const token = localStorage.getItem("pd_token");
-      const res = await fetch("/api/admin/hotels", {
+      const res = await fetch(`/api/admin/hotels/${hotelId}/approve`, {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ hotelId, status: newStatus }),
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (res.ok) {
         fetchHotels();
+        alert("Hôtel approuvé avec succès !");
+      } else {
+        alert("Erreur lors de l'approbation");
       }
     } catch (error) {
-      console.error("Erreur mise à jour hôtel:", error);
+      alert("Erreur réseau");
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  const handleDeleteHotel = async (hotelId: string) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cet hôtel ?")) {
-      return;
-    }
+  const handleReject = async (hotelId: string) => {
+    const reason = prompt("Raison du refus (optionnel):");
+    if (reason === null) return;
 
+    setActionLoading(hotelId);
     try {
       const token = localStorage.getItem("pd_token");
-      const res = await fetch("/api/admin/hotels", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(`/api/admin/hotels/${hotelId}/reject`, {
+        method: "PATCH",
+        headers: { 
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}` 
         },
-        body: JSON.stringify({ hotelId }),
+        body: JSON.stringify({ reason }),
       });
 
       if (res.ok) {
         fetchHotels();
+        alert("Hôtel rejeté");
+      } else {
+        alert("Erreur lors du rejet");
       }
     } catch (error) {
-      console.error("Erreur suppression hôtel:", error);
+      alert("Erreur réseau");
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  const filteredHotels = hotels.filter(
-    (hotel) =>
-      hotel.name.toLowerCase().includes(filter.toLowerCase()) ||
-      hotel.city.toLowerCase().includes(filter.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredHotels.length / hotelsPerPage);
-  const startIndex = (currentPage - 1) * hotelsPerPage;
-  const paginatedHotels = filteredHotels.slice(startIndex, startIndex + hotelsPerPage);
-
-  const handleExport = () => {
-    const exportData = filteredHotels.map(hotel => ({
-      Nom: hotel.name,
-      Ville: hotel.city,
-      Pays: hotel.country,
-      Adresse: hotel.address,
-      "Prix/Nuit": hotel.pricePerNight,
-      Note: hotel.rating,
-      Statut: hotel.status,
-      Réservations: hotel.bookings_count,
-      "Date de création": new Date(hotel.createdAt).toLocaleDateString()
-    }));
-    exportToCSV(exportData, "hotels_pickndream");
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      PENDING: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+      ACTIVE: "bg-green-500/10 text-green-400 border-green-500/30",
+      INACTIVE: "bg-red-500/10 text-red-400 border-red-500/30",
+    };
+    return styles[status as keyof typeof styles] || "bg-gray-500/10 text-gray-400";
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-slate-800/60 bg-slate-900/60 backdrop-blur-sm pt-16 lg:pt-0">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <h1 className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Gestion des Hôtels
-            </h1>
-          </div>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-white">Modération des Hôtels</h1>
+        
+        <div className="flex gap-2">
+          {["PENDING", "ACTIVE", "INACTIVE", "all"].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className={`px-4 py-2 rounded-xl text-sm transition-all ${
+                filter === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              {status === "all" ? "Tous" : 
+               status === "PENDING" ? "En attente" :
+               status === "ACTIVE" ? "Approuvés" : "Rejetés"}
+            </button>
+          ))}
         </div>
-      </header>
+      </div>
 
-      {/* Contenu principal */}
-      <main className="px-4 sm:px-6 lg:px-8 py-8">
-        {/* Barre de recherche et actions */}
-        <div className="mb-6 flex items-center gap-4">
-          <input
-            type="text"
-            placeholder="Rechercher par nom ou ville..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="flex-1 max-w-md px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <button
-            onClick={handleExport}
-            className="px-4 py-2 rounded-xl bg-green-600/20 border border-green-500/30 text-green-300 hover:bg-green-600/30 text-sm transition-all duration-200 flex items-center gap-2"
-          >
-            <span>📊</span>
-            Exporter CSV
-          </button>
-          <button
-            onClick={() => router.push("/dashboard/hotels/new")}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-sm font-medium transition-all duration-200 flex items-center gap-2"
-          >
-            <span>➕</span>
-            Créer un hôtel
-          </button>
+      {loading ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
         </div>
-
-        {/* Liste des hôtels */}
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-sm opacity-60">Chargement...</p>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {paginatedHotels.map((hotel) => (
-              <div
-                key={hotel.id}
-                onClick={() => router.push(`/dashboard/hotels/${hotel.id}`)}
-                className="rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-sm p-6 hover:border-purple-500/40 transition-all duration-300 cursor-pointer"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-16 h-16 rounded-xl bg-slate-800 overflow-hidden">
-                      {hotel.photoUrl ? (
-                        <img
-                          src={hotel.photoUrl}
-                          alt={hotel.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-2xl">
-                          🏨
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{hotel.name}</h3>
-                      <p className="text-sm opacity-60">
-                        {hotel.city}, {hotel.country}
-                      </p>
-                      <p className="text-xs opacity-40">{hotel.address}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-xs uppercase opacity-60">Prix/Nuit</p>
-                      <p className="font-bold">{hotel.pricePerNight}€</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs uppercase opacity-60">Note</p>
-                      <p className="font-bold">⭐ {hotel.rating.toFixed(1)}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs uppercase opacity-60">Réservations</p>
-                      <p className="font-bold">{hotel.bookings_count}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs uppercase opacity-60">Statut</p>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleStatus(hotel.id, hotel.status);
+      ) : (
+        <div className="grid gap-4">
+          {hotels.map((hotel) => (
+            <div
+              key={hotel.id}
+              className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6"
+            >
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Photo principale */}
+                <div className="lg:col-span-1">
+                  <div className="h-48 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                    {hotel.photoUrl ? (
+                      <img
+                        src={hotel.photoUrl}
+                        alt={hotel.name}
+                        className="w-full h-full object-contain bg-slate-900"
+                        onError={(e) => {
+                          // Si l'image ne charge pas, afficher le placeholder
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
                         }}
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          hotel.status === "ACTIVE"
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-red-500/20 text-red-300"
-                        }`}
-                      >
-                        {hotel.status}
-                      </button>
+                      />
+                    ) : null}
+                    <div className={`text-center ${hotel.photoUrl ? 'hidden' : ''}`}>
+                      <span className="text-4xl mb-2 block">🏨</span>
+                      <p className="text-xs text-slate-400">Photo non disponible</p>
+                      <p className="text-xs text-slate-500 mt-1">L'upload de photos sera disponible prochainement</p>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteHotel(hotel.id);
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-red-600/20 border border-red-500/30 text-red-300 hover:bg-red-600/30 text-sm transition-all duration-200"
-                    >
-                      Supprimer
-                    </button>
                   </div>
                 </div>
+
+                {/* Informations détaillées */}
+                <div className="lg:col-span-2">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h3 className="text-xl font-semibold text-white">{hotel.name}</h3>
+                    <span className={`px-3 py-1 rounded-full text-xs border ${getStatusBadge(hotel.status)}`}>
+                      {hotel.status}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300 mb-4">
+                    <div>
+                      <p><strong>🏙️ Ville:</strong> {hotel.city}, {hotel.country}</p>
+                      <p><strong>📍 Adresse:</strong> {hotel.address}</p>
+                      <p><strong>💰 Prix:</strong> {hotel.pricePerNight}€/nuit</p>
+                      <p><strong>⭐ Note:</strong> {hotel.rating}/5</p>
+                    </div>
+                    <div>
+                      <p><strong>📅 Créé le:</strong> {new Date(hotel.createdAt).toLocaleDateString()}</p>
+                      <p><strong>🆔 ID:</strong> {hotel.id.slice(0, 8)}...</p>
+                    </div>
+                  </div>
+
+                  {/* Description complète */}
+                  {hotel.description && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-white mb-2">📝 Description:</h4>
+                      <div className="p-3 bg-slate-800/50 rounded-xl">
+                        <p className="text-sm text-slate-300 leading-relaxed">
+                          {hotel.description}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Raison de rejet si applicable */}
+                  {hotel.rejectionReason && (
+                    <div className="p-3 bg-red-900/20 border border-red-700/50 rounded-xl">
+                      <p className="text-sm text-red-300">
+                        <strong>❌ Raison du refus:</strong> {hotel.rejectionReason}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="lg:col-span-1 flex flex-col gap-3">
+                  {hotel.status === "PENDING" && (
+                    <>
+                      <button
+                        onClick={() => handleApprove(hotel.id)}
+                        disabled={actionLoading === hotel.id}
+                        className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                      >
+                        {actionLoading === hotel.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          <>✅ Approuver</>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleReject(hotel.id)}
+                        disabled={actionLoading === hotel.id}
+                        className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                      >
+                        {actionLoading === hotel.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        ) : (
+                          <>❌ Rejeter</>
+                        )}
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Bouton voir détails complets */}
+                  <button
+                    onClick={() => router.push(`/dashboard/hotels/${hotel.id}`)}
+                    className="w-full px-4 py-2 border border-slate-600 hover:bg-slate-800 text-slate-300 rounded-xl text-sm transition-colors"
+                  >
+                    👁️ Voir détails
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
 
-        {!loading && filteredHotels.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-sm opacity-60">Aucun hôtel trouvé</p>
-          </div>
-        )}
-
-        {!loading && filteredHotels.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </main>
+          {hotels.length === 0 && (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800/60 mb-4">
+                <span className="text-3xl">🏨</span>
+              </div>
+              <p className="text-slate-400 text-lg mb-2">
+                {filter === "PENDING" 
+                  ? "Aucun hôtel en attente de validation" 
+                  : `Aucun hôtel ${filter.toLowerCase()}`}
+              </p>
+              <p className="text-slate-500 text-sm">
+                Les nouveaux hôtels soumis apparaîtront ici
+              </p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
