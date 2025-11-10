@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyToken } from "@/lib/auth";
 
-export async function GET(
+export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
@@ -17,40 +17,33 @@ export async function GET(
     }
 
     const payload = verifyToken(token);
-    if (!payload) {
+    if (!payload || payload.role !== "ADMIN") {
       return NextResponse.json(
-        { success: false, message: "Token invalide" },
+        { success: false, message: "Accès refusé" },
         { status: 403 }
       );
     }
 
-    // Récupérer l'hôtel
-    const hotel = await prisma.hotel.findUnique({
+    // Récupérer la raison du rejet
+    const body = await req.json();
+    const { reason } = body;
+
+    // Rejeter l'hôtel
+    const hotel = await prisma.hotel.update({
       where: { id: params.id },
-      include: {
-        owner: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+      data: {
+        status: "REJECTED",
+        rejectionReason: reason || "Non conforme",
       },
     });
 
-    if (!hotel) {
-      return NextResponse.json(
-        { success: false, message: "Hôtel non trouvé" },
-        { status: 404 }
-      );
-    }
-
     return NextResponse.json({
       success: true,
+      message: "Hôtel rejeté",
       hotel,
     });
   } catch (error) {
-    console.error("Erreur récupération hôtel:", error);
+    console.error("Erreur rejet hôtel:", error);
     return NextResponse.json(
       { success: false, message: "Erreur serveur" },
       { status: 500 }
