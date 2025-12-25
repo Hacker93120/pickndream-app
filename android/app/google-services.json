@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "792093734940",
+    "project_id": "pickndream-dashboard",
+    "storage_bucket": "pickndream-dashboard.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792093734940:android:c8e50d21fd2f1917e087d9",
+        "android_client_info": {
+          "package_name": "com.pickndream.pickndream"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXx98v8BiS34Dh8umFiKRTpZG75fMnOZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

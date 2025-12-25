@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PICKNDREAM_POSTGRES_PRISMA_URL")
+  directUrl = env("PICKNDREAM_DATABASE_URL_UNPOOLED")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  phone     String?
+  photoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hotels    Hotel[]
+  bookings  Booking[]
+  photos    Photo[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  ownerId     String
+  name        String
+  description String?
+  city        String
+  address     String
+  country     String   @default("France")
+  latitude    Float?
+  longitude   Float?
+  rating      Float    @default(0)
+  pricePerNight Int
+  status      HotelStatus @default(PENDING_REVIEW)
+  isListed   Boolean  @default(false)
+  photoUrl    String?
+  rejectionReason String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings    Booking[]
+  photos      Photo[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([isListed])
+}
+
+enum HotelStatus {
+  // Nouveaux statuts
+  PENDING
+  PENDING_REVIEW
+  ACTIVE
+  INACTIVE
+  // Anciens statuts (pour compatibilité)
+  DRAFT
+  APPROVED
+  REJECTED
+  PAUSED
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  userId      String
+  hotelId     String
+  checkIn     DateTime
+  checkOut    DateTime
+  totalPrice  Int
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hotel       Hotel    @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([hotelId])
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  publicId  String
+  userId    String?
+  hotelId   String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hotel     Hotel?   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([hotelId])
+}

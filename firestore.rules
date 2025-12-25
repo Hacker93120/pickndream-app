@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Collection hotels - lecture publique, écriture authentifiée
+    match /hotels/{hotelId} {
+      allow read: if true;  // Lecture publique pour l'app mobile
+      allow write: if request.auth != null;  // Écriture seulement si authentifié
+    }
+    
+    // Collection bookings - accès authentifié uniquement
+    match /bookings/{bookingId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Collection users - accès personnel uniquement
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Autres collections de l'écosystème - accès restreint
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

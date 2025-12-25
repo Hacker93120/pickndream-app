@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Admin Hotels</title>
+</head>
+<body>
+    <h1>Test API Admin Hotels</h1>
+    <div id="result"></div>
+    
+    <script>
+    async function test() {
+        const resultDiv = document.getElementById('result');
+        
+        // Récupérer le token
+        const token = localStorage.getItem('pd_token');
+        resultDiv.innerHTML = '<p>Token: ' + (token ? 'Trouvé' : 'NON TROUVÉ') + '</p>';
+        
+        if (!token) {
+            resultDiv.innerHTML += '<p style="color: red;">Vous devez être connecté pour voir les hôtels</p>';
+            return;
+        }
+        
+        // Tester l'API
+        try {
+            resultDiv.innerHTML += '<p>Appel API en cours...</p>';
+            
+            const response = await fetch('/api/admin/hotels?status=PENDING', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            resultDiv.innerHTML += '<p>Status: ' + response.status + '</p>';
+            
+            const data = await response.json();
+            resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        } catch (error) {
+            resultDiv.innerHTML += '<p style="color: red;">Erreur: ' + error.message + '</p>';
+        }
+    }
+    
+    test();
+    </script>
+</body>
+</html>
